@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from imagenet.dataset import data_loader
 
 
 def imshow(inp, title=None):
@@ -24,11 +25,19 @@ def imshow(inp, title=None):
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
+    # plt.pause(0.001)  # pause a bit so that plots are updated
 
-def visualize_model(model, dataloaders, device, class_names, num_images=6,):
-    model = models.resnet18(pretrained=False)
-    model.load_state_dict(torch.load('./weights'))
+def visualize_model(device, weights, num_images=6,):
+
+    model = models.resnet18(pretrained=True)
+    num_ftrs = model.fc.in_features
+    model.fc = nn.Linear(num_ftrs, 2)
+    model = model.to(device)
+
+    model.load_state_dict(torch.load('./imagenet/weights/model_final.pth', map_location=torch.device(device)))
+
+    dataloaders, class_names, dataset_sizes = data_loader()
+
     was_training = model.training
     model.eval()
     images_so_far = 0
@@ -51,5 +60,6 @@ def visualize_model(model, dataloaders, device, class_names, num_images=6,):
 
                 if images_so_far == num_images:
                     model.train(mode=was_training)
-                    return
+                    plt.show()          
+
         model.train(mode=was_training)

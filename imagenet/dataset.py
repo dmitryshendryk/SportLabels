@@ -10,12 +10,10 @@ import time
 import os
 import copy
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def data_loader():
 
-    # Just normalization for validation
     data_transforms = {
         'train': transforms.Compose([
             transforms.RandomResizedCrop(224),
@@ -31,7 +29,7 @@ def data_loader():
         ]),
     }
 
-    data_dir = 'data'
+    data_dir = 'imagenet/data'
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                             data_transforms[x])
                     for x in ['train', 'val']}
