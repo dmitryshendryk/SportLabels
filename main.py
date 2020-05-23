@@ -9,6 +9,7 @@ sys.path.append(ROOT)
 
 from imagenet.imagenet_train import train
 from imagenet.visualize import visualize_model
+from imagenet.inference import ImageClassification
 
 if __name__ == '__main__':
     import argparse
@@ -35,7 +36,8 @@ if __name__ == '__main__':
             train(args.device, args.save_weights)
 
     if args.command == 'process':
-        pass
+        im = ImageClassification(args.folder_path)
+        im.start(args.device, args.weights)
 
     if args.command == 'visualize':
         if args.network == 'imagenet':

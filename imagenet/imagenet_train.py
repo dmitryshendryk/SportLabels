@@ -14,7 +14,7 @@ import copy
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-from imagenet.dataset import data_loader
+from imagenet.dataset import DataSetLoader
 
 def train_model(model, criterion, optimizer, scheduler, dataloaders, dataset_sizes, num_epochs=25):
     since = time.time()
@@ -88,7 +88,8 @@ def train(device, save_weigths):
     model_ft = models.resnet18(pretrained=True)
     num_ftrs = model_ft.fc.in_features
 
-    dataloader, _, dataset_sizes = data_loader()
+    ds = DataSetLoader()
+    dataloader, _, dataset_sizes = ds.data_loader()
     model_ft.fc = nn.Linear(num_ftrs, 2)
 
     model_ft = model_ft.to(device)
