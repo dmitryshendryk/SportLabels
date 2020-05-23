@@ -1,4 +1,4 @@
-PIL == 2.2.1
+Pillow == 2.2.1
 pyzbar == 0.1.8
 opencv-python == 4.2.0.34
 scipy == 1.1.0
