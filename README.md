@@ -4,6 +4,8 @@
 
 Requirements is to sort the Size and images and Box images into seperate folders using computer vision.
 
+The device can be used: ['cpu','cuda']
+
 ### Train 
 
 ```python
