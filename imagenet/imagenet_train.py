@@ -107,7 +107,7 @@ def main():
 
 
     model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, dataloader, dataset_sizes,
-                       num_epochs=10)
+                       num_epochs=25)
     
     torch.save(model_ft.state_dict(), './weights/model_final.pth')
 
