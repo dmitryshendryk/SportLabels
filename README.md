@@ -1,6 +1,6 @@
 # SportLabels
 
-## Clasify Size and Boxes
+## Classify Size and Boxes
 
 Requirements is to sort the Size and images and Box images into seperate folders using computer vision.
 
