@@ -16,10 +16,10 @@ limitations under the License.
 
 import torch.nn as nn
 
-from deeptext.modules.transformation import TPS_SpatialTransformerNetwork
-from deeptext.modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
-from deeptext.modules.sequence_modeling import BidirectionalLSTM
-from deeptext.modules.prediction import Attention
+from ocr_tools.craft_ocr.deeptext.modules.transformation import TPS_SpatialTransformerNetwork
+from ocr_tools.craft_ocr.deeptext.modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
+from ocr_tools.craft_ocr.deeptext.modules.sequence_modeling import BidirectionalLSTM
+from ocr_tools.craft_ocr.deeptext.modules.prediction import Attention
 
 
 class Model(nn.Module):

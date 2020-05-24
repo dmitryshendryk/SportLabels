@@ -3,11 +3,11 @@ import os
 import numpy as np
 import pandas as pd
 import cv2
-import imgproc
+import ocr_tools.craft_ocr.imgproc
 from copy import deepcopy
 from PIL import Image
-from PerspectiveTransform import four_point_transform
-from deeptext.demo import demo
+from ocr_tools.craft_ocr.PerspectiveTransform import four_point_transform
+from ocr_tools.craft_ocr.deeptext.demo import demo
 
 # borrowed from https://github.com/lengstrom/fast-style-transfer/blob/master/src/utils.py
 def get_files(img_dir):
@@ -35,7 +35,7 @@ def list_files(in_path):
     # gt_files.sort()
     return img_files, mask_files, gt_files
 
-def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=None, args=None):
+def saveResult(img_file, img, boxes, args=None):
         """ save text detection result one by one
         Args:
             img_file (str): image file name
@@ -61,6 +61,6 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
             img_ = Image.fromarray(warped, 'RGB')
             bboxes.append(img_)
 
-        text = demo(args, bboxes, filename)
+        text = demo(args, bboxes)
 
         return text, filename

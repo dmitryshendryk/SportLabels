@@ -6,14 +6,12 @@ import torch.backends.cudnn as cudnn
 import torch.utils.data
 import torch.nn.functional as F
 
-from deeptext.utils import CTCLabelConverter, AttnLabelConverter
-from deeptext.dataset import RawDataset, AlignCollate
-from deeptext.model import Model
+from ocr_tools.craft_ocr.deeptext.utils import CTCLabelConverter, AttnLabelConverter
+from ocr_tools.craft_ocr.deeptext.dataset import RawDataset, AlignCollate
+from ocr_tools.craft_ocr.deeptext.model import Model
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-DEFAULT_CHARACTERS = '0123456789abcdefghijklmnopqrstuvwxyz'
-
-def demo(opt, images, image_name):
+def demo(opt, images):
     """ model configuration """
     if 'CTC' in opt.Prediction:
         converter = CTCLabelConverter(opt.character)

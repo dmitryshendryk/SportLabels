@@ -10,6 +10,7 @@ sys.path.append(ROOT)
 from imagenet.imagenet_train import train
 from imagenet.visualize import visualize_model
 from imagenet.inference import ImageClassification
+from ocr_tools.craft_ocr.test import start_craft
 
 if __name__ == '__main__':
     import argparse
@@ -27,11 +28,12 @@ if __name__ == '__main__':
     parser.add_argument('--weights')
     parser.add_argument('--save_weights')
     parser.add_argument('--folder_path')
-    parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
+
+    parser.add_argument('--trained_model', default='ocr_tools/craft_ocr/weights/craft_mlt_25k.pth', type=str, help='pretrained model')
     parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
     parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score')
     parser.add_argument('--link_threshold', default=0.4, type=float, help='link confidence threshold')
-    parser.add_argument('--cuda', default=False, type=str2bool, help='Use cuda for inference')
+    parser.add_argument('--cuda', default=False, help='Use cuda for inference')
     parser.add_argument('--canvas_size', default=1280, type=int, help='image size for inference')
     parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
     parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
     parser.add_argument('--batch_size', type=int, default=192, help='input batch size')
     parser.add_argument('--saved_model', help="path to saved_model to evaluation",
-                        default='weights/TPS-ResNet-BiLSTM-Attn.pth')
+                        default='ocr_tools/craft_ocr/weights/TPS-ResNet-BiLSTM-Attn.pth')
     """ Data processing """
     parser.add_argument('--batch_max_length', type=int, default=25, help='maximum-label-length')
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image')
@@ -78,4 +80,7 @@ if __name__ == '__main__':
     if args.command == 'visualize':
         if args.network == 'imagenet':
             visualize_model(args.device, args.weights, 6)
+
+    if args.command == 'ocr':
+        start_craft(args)
 
