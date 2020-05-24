@@ -21,3 +21,9 @@ python main.py  visualize --network=imagenet --device=cpu --weights=./imagenet/w
 ```python
 python main.py  process  --folder_path=/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/test  --device=cpu --save_weights=./imagenet/weights/model_final.pth
 ```
+
+### Start OCR
+
+```python
+python main.py  ocr  --test_folder=[path to valid folders]
+```
