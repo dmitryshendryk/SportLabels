@@ -150,6 +150,7 @@ def start_craft(args):
                                                      args.cuda, args.poly, refine_net, args=args)
 
                 text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
+                print(text)
                 df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text]]), columns=['name', 'characters'])
                 dataframe = dataframe.append(df, ignore_index=False)
 

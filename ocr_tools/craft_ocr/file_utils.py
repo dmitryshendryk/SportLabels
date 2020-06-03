@@ -8,6 +8,7 @@ from copy import deepcopy
 from PIL import Image
 from ocr_tools.craft_ocr.PerspectiveTransform import four_point_transform
 from ocr_tools.craft_ocr.deeptext.demo import demo
+from operator import itemgetter
 
 # borrowed from https://github.com/lengstrom/fast-style-transfer/blob/master/src/utils.py
 def get_files(img_dir):
@@ -35,8 +36,11 @@ def list_files(in_path):
     # gt_files.sort()
     return img_files, mask_files, gt_files
 
+
 def saveResult(img_file, img, boxes, args=None):
-        """ save text detection result one by one
+        """
+
+        save text detection result one by one
         Args:
             img_file (str): image file name
             img (array): raw image context
@@ -46,6 +50,7 @@ def saveResult(img_file, img, boxes, args=None):
             text of picture, picture's name
 
         """
+
         img = np.array(img)
         img_copy = deepcopy(img)
         # make result file list
@@ -53,10 +58,11 @@ def saveResult(img_file, img, boxes, args=None):
 
         bboxes = []
 
-        for i, box in enumerate(boxes):
+        boxes = np.array([np.array(box).astype(np.int32).reshape((-1)) for box in boxes])
+        boxes = sorted(boxes, key=itemgetter(7, 6))
 
-            poly = np.array(box).astype(np.int32).reshape((-1))
-            poly = poly.reshape(-1, 2)
+        for i, box in enumerate(boxes):
+            poly = box.reshape(-1, 2)
             warped = four_point_transform(img_copy, poly)
             img_ = Image.fromarray(warped, 'RGB')
             bboxes.append(img_)
