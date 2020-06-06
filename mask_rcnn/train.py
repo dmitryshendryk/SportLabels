@@ -20,7 +20,7 @@ ROOT = os.path.abspath('../')
 DATA_FOLDER = 'mask_rcnn/data'
 CONFIG = 'mask_rcnn/config'
 WEIGHTS = 'mask_rcnn/weights'
-DEVICE = 'cpu'
+DEVICE = 'cuda'
 
 sys.path.append(ROOT)
 
