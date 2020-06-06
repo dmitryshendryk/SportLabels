@@ -66,7 +66,7 @@ def train():
     cfg = get_cfg()
     cfg.merge_from_file(os.path.join(ROOT, CONFIG, "mask_rcnn_R_50_FPN_3x.yaml"))
     cfg.DATASETS.TRAIN = ("carplate_train",)
-    cfg.DATASETS.TEST = ("carplate_val")
+    cfg.DATASETS.TEST = ("carplate_val",)
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.MODEL.DEVICE = DEVICE
     cfg.MODEL.WEIGHTS = os.path.join(ROOT,WEIGHTS,"R-50.pkl")  # Let training initialize from model zoo
