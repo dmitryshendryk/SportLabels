@@ -76,11 +76,13 @@ if __name__ == '__main__':
     if args.command == 'process':
         im = ImageClassification(args.folder_path)
         im.start(args.device, args.weights)
+        start_craft(args)
 
     if args.command == 'visualize':
         if args.network == 'imagenet':
             visualize_model(args.device, args.weights, 6)
 
     if args.command == 'ocr':
-        start_craft(args)
+        pass
+        
 
