@@ -71,7 +71,11 @@ def train():
     cfg.MODEL.DEVICE = DEVICE
     cfg.MODEL.WEIGHTS = os.path.join(ROOT,WEIGHTS,"R-50.pkl")  # Let training initialize from model zoo
     cfg.SOLVER.IMS_PER_BATCH = 2
-    cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
+    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
+    cfg.TEST.EVAL_PERIOD = 500
+    cfg.SOLVER.GAMMA = 0.05
+    cfg.SOLVER.STEPS = (1000, 2000, 3000, 4000)
+    cfg.SOLVER.BASE_LR = 0.00005  # pick a good LR
     cfg.SOLVER.MAX_ITER = 5000    # 300 iterations seems good enough for this toy dataset; you may need to train longer for a practical dataset
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  # only has one class (ballon)
