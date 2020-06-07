@@ -74,7 +74,7 @@ def train():
     cfg.MODEL.WEIGHTS = os.path.join(ROOT,WEIGHTS,"R-50.pkl")  # Let training initialize from model zoo
     cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.SOLVER.CHECKPOINT_PERIOD = 1000
-    cfg.TEST.EVAL_PERIOD = 500
+    cfg.TEST.EVAL_PERIOD = 50
     cfg.SOLVER.GAMMA = 0.05
     # cfg.SOLVER.STEPS = (600, 1200, 1800, 2400, 3000, 3600, 4200, 4800)
     cfg.SOLVER.BASE_LR = 0.00005  # pick a good LR
