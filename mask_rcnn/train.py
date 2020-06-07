@@ -70,7 +70,7 @@ def train():
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.MODEL.DEVICE = DEVICE
     cfg.MODEL.WEIGHTS = os.path.join(ROOT,WEIGHTS,"model_final_2d9806.pkl")  # Let training initialize from model zoo
-    cfg.SOLVER.IMS_PER_BATCH = 4
+    cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.SOLVER.CHECKPOINT_PERIOD = 1000
     cfg.TEST.EVAL_PERIOD = 100
     cfg.SOLVER.GAMMA = 0.05
