@@ -12,7 +12,7 @@ def get_carplate_dicts(mode):
     DATA_FOLDER = 'mask_rcnn/data'
     path = os.path.join(ROOT, DATA_FOLDER)
     json_file = os.path.join(path, "via_project_3Jun2020_12h29m.json")
-    with open(json_file) as f:
+    with open(json_file, encoding='utf-8') as f:
         imgs_anns = json.load(f)
     
     dataset_dicts = []

@@ -56,7 +56,7 @@ def train():
     DatasetCatalog.register("carplate_train", lambda x='train':  get_carplate_dicts(x))
     DatasetCatalog.register("carplate_val", lambda x='val':  get_carplate_dicts(x))
     MetadataCatalog.get("carplate_val").set(thing_classes=["box","size"])
-    carplate_metadata = MetadataCatalog.get("carplate_val")
+    # carplate_metadata = MetadataCatalog.get("carplate_val")
 
     MetadataCatalog.get("carplate_val").set(evaluator_type='coco')
 
