@@ -55,7 +55,7 @@ def train():
 
     DatasetCatalog.register("carplate_train", lambda x='train':  get_carplate_dicts(x))
     DatasetCatalog.register("carplate_val", lambda x='val':  get_carplate_dicts(x))
-    MetadataCatalog.get("carplate_val").set(thing_classes=["box","size"])
+    MetadataCatalog.get("carplate_val").set(thing_classes=["box"])
     # carplate_metadata = MetadataCatalog.get("carplate_val")
 
     MetadataCatalog.get("carplate_val").set(evaluator_type='coco')
@@ -78,7 +78,7 @@ def train():
     cfg.SOLVER.BASE_LR = 0.00005  # pick a good LR
     cfg.SOLVER.MAX_ITER = 5000    # 300 iterations seems good enough for this toy dataset; you may need to train longer for a practical dataset
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512   # faster, and good enough for this toy dataset (default: 512)
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  # only has one class (ballon)
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1  # only has one class (ballon)
 
 
 
