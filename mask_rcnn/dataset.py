@@ -9,9 +9,9 @@ from detectron2.structures import BoxMode
 
 def get_carplate_dicts(mode):
     ROOT = os.path.abspath('../')
-    DATA_FOLDER = 'mask_rcnn/data'
+    DATA_FOLDER = 'mask_rcnn/plates_with_json'
     path = os.path.join(ROOT, DATA_FOLDER)
-    json_file = os.path.join(path, "via_project_7Jun2020_14h12m.json")
+    json_file = os.path.join(path, "dataset_mask_full_no_aug.json")
     with open(json_file, encoding='utf-8') as f:
         imgs_anns = json.load(f)
     
