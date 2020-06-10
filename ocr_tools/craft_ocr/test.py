@@ -27,6 +27,7 @@ import json
 import zipfile
 from ocr_tools.craft_ocr.craft import CRAFT
 from collections import OrderedDict
+from mask_rcnn.inference import Mask_RCNN_detector
 
 
 def copyStateDict(state_dict):
@@ -101,6 +102,8 @@ def start_craft(args):
     # load net
     net = CRAFT()     # initialize
 
+    mask_rcnn = Mask_RCNN_detector()
+
     print('Loading weights from checkpoint (' + args.trained_model + ')')
     if args.cuda:
         net.load_state_dict(copyStateDict(torch.load(args.trained_model)))
@@ -145,14 +148,20 @@ def start_craft(args):
                 print("Test image {:d}/{:d}: {:s}".format(k, len(filenames), image_path), end='\r')
                 image = imgproc.loadImage(image_path)
 
-                bboxes, polys, score_text = test_net(net, image, args.text_threshold,
-                                                     args.link_threshold, args.low_text,
-                                                     args.cuda, args.poly, refine_net, args=args)
+                cropped_images = mask_rcnn.detection(image, args.cuda)
 
-                text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
-                print(text)
-                df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text]]), columns=['name', 'characters'])
-                dataframe = dataframe.append(df, ignore_index=False)
+                
+                for image in cropped_images:
+                    cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
+
+                    bboxes, polys, score_text = test_net(net, image, args.text_threshold,
+                                                        args.link_threshold, args.low_text,
+                                                        args.cuda, args.poly, refine_net, args=args)
+
+                    text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
+                    print(text)
+                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text]]), columns=['name', 'characters'])
+                    dataframe = dataframe.append(df, ignore_index=False)
 
     if not os.path.isdir('output'):
         os.mkdir('output')
