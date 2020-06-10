@@ -100,11 +100,11 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
 
 
-def start_craft(args):
+def start_craft(args, ROOT):
     # load net
     net = CRAFT()     # initialize
 
-    mask_rcnn = Mask_RCNN_detector()
+    mask_rcnn = Mask_RCNN_detector(args.device, ROOT)
 
     print('Loading weights from checkpoint (' + args.trained_model + ')')
     if args.cuda:
@@ -159,7 +159,6 @@ def start_craft(args):
                     bboxes, polys, score_text = test_net(net, image, args.text_threshold,
                                                         args.link_threshold, args.low_text,
                                                         args.cuda, args.poly, refine_net, args=args)
-
                     text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
                     print(text)
                     df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])

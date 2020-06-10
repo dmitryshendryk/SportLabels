@@ -15,26 +15,26 @@ import cv2
 import numpy as np
 
 
-ROOT = os.path.abspath('../')
-CONFIG = 'code/mask_rcnn/config'
-WEIGHTS = 'code/mask_rcnn/weights'
+# ROOT = os.path.abspath('../')
+# CONFIG = 'code/mask_rcnn/config'
+# WEIGHTS = 'code/mask_rcnn/weights'
 
 
 
 class Mask_RCNN_detector():
-    def __init__(self):
+    def __init__(self, device, ROOT):
         print("Load Mask RCNN", end='\n')
         cfg = get_cfg()
-        cfg.merge_from_file(os.path.join(ROOT, CONFIG, "mask_rcnn_R_50_FPN_3x.yaml"))
+        cfg.merge_from_file(os.path.join(ROOT, 'mask_rcnn/config', "mask_rcnn_R_50_FPN_3x.yaml"))
         cfg.DATALOADER.NUM_WORKERS = 2
-        cfg.MODEL.DEVICE = 'cpu'
+        cfg.MODEL.DEVICE = device
         cfg.SOLVER.IMS_PER_BATCH = 2
         cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
         cfg.SOLVER.MAX_ITER = 300    # 300 iterations seems good enough for this toy dataset; you may need to train longer for a practical dataset
         cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # faster, and good enough for this toy dataset (default: 512)
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1  # only has one class (ballon)
 
-        cfg.MODEL.WEIGHTS = os.path.join(ROOT,WEIGHTS, "mask_rcnn_model_final.pth")
+        cfg.MODEL.WEIGHTS = os.path.join(ROOT, 'mask_rcnn/weights', "mask_rcnn_model_final.pth")
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set the testing threshold for this model
         
         self.predictor = DefaultPredictor(cfg)

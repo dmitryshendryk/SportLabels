@@ -76,7 +76,7 @@ if __name__ == '__main__':
     if args.command == 'process':
         im = ImageClassification(args.folder_path)
         im.start(args.device, args.weights)
-        start_craft(args)
+        start_craft(args, ROOT)
 
     if args.command == 'visualize':
         if args.network == 'imagenet':
