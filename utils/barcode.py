@@ -8,10 +8,10 @@ import os
 ROOT = os.path.abspath('./')
 
 
-def read_barcode(img):
-    image = cv2.imread(img)
+def read_barcode(image):
+#     image = cv2.imread(img)
 
-     
+    print("Reading barcodes")
     # find the barcodes in the image and decode each of the barcodes
     barcodes = pyzbar.decode(image)
     print(barcodes)

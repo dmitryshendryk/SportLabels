@@ -29,6 +29,8 @@ from ocr_tools.craft_ocr.craft import CRAFT
 from collections import OrderedDict
 from mask_rcnn.inference import Mask_RCNN_detector
 
+from utils.barcode import read_barcode
+
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -152,15 +154,15 @@ def start_craft(args):
 
                 
                 for image in cropped_images:
-                    cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
-
+                    # cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
+                    barcode_result = read_barcode(image)
                     bboxes, polys, score_text = test_net(net, image, args.text_threshold,
                                                         args.link_threshold, args.low_text,
                                                         args.cuda, args.poly, refine_net, args=args)
 
                     text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
                     print(text)
-                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text]]), columns=['name', 'characters'])
+                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])
                     dataframe = dataframe.append(df, ignore_index=False)
 
     if not os.path.isdir('output'):
