@@ -25,10 +25,11 @@ import ocr_tools.craft_ocr.imgproc as imgproc
 import ocr_tools.craft_ocr.file_utils as file_utils
 import json
 import zipfile
-from ocr_tools.craft_ocr.craft import CRAFT
 from collections import OrderedDict
 from mask_rcnn.inference import Mask_RCNN_detector
-
+from ocr_tools.craft_ocr.craft import CRAFT
+from ocr_tools.craft_ocr.deeptext.model import Model
+from ocr_tools.craft_ocr.deeptext.utils import CTCLabelConverter, AttnLabelConverter
 from utils.barcode import read_barcode
 
 
@@ -101,16 +102,29 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
 
 def start_craft(args, ROOT):
+
     # load net
     net = CRAFT()     # initialize
 
     mask_rcnn = Mask_RCNN_detector(args.device, ROOT)
 
-    print('Loading weights from checkpoint (' + args.trained_model + ')')
-    if args.cuda:
-        net.load_state_dict(copyStateDict(torch.load(args.trained_model)))
+    """ model configuration """
+    if 'CTC' in args.Prediction:
+        converter = CTCLabelConverter(args.character)
     else:
-        net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location='cpu')))
+        converter = AttnLabelConverter(args.character)
+    args.num_class = len(converter.character)
+
+    if args.rgb:
+        args.input_channel = 3
+    ocr_model = Model(args)
+    ocr_model = torch.nn.DataParallel(ocr_model).to(args.device)
+    ocr_model.load_state_dict(torch.load(args.saved_model, map_location=args.device))
+
+
+
+    print('Loading weights from checkpoint (' + args.trained_model + ')')
+    net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location=args.device)))
 
     if args.cuda:
         net = net.cuda()
@@ -159,7 +173,7 @@ def start_craft(args, ROOT):
                     bboxes, polys, score_text = test_net(net, image, args.text_threshold,
                                                         args.link_threshold, args.low_text,
                                                         args.cuda, args.poly, refine_net, args=args)
-                    text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, args=args)
+                    text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, model=ocr_model, converter=converter, args=args)
                     print(text)
                     df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])
                     dataframe = dataframe.append(df, ignore_index=False)

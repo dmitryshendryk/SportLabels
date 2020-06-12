@@ -6,32 +6,16 @@ import torch.backends.cudnn as cudnn
 import torch.utils.data
 import torch.nn.functional as F
 
-from ocr_tools.craft_ocr.deeptext.utils import CTCLabelConverter, AttnLabelConverter
+
 from ocr_tools.craft_ocr.deeptext.dataset import RawDataset, AlignCollate
-from ocr_tools.craft_ocr.deeptext.model import Model
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def demo(opt, images):
-    """ model configuration """
-    if 'CTC' in opt.Prediction:
-        converter = CTCLabelConverter(opt.character)
-    else:
-        converter = AttnLabelConverter(opt.character)
-    opt.num_class = len(converter.character)
+def demo(opt, images, model, converter):
+    """
+    Data preparing
+    """
 
-    if opt.rgb:
-        opt.input_channel = 3
-    model = Model(opt)
-    print('model input parameters', opt.imgH, opt.imgW, opt.num_fiducial, opt.input_channel, opt.output_channel,
-          opt.hidden_size, opt.num_class, opt.batch_max_length, opt.Transformation, opt.FeatureExtraction,
-          opt.SequenceModeling, opt.Prediction)
-    model = torch.nn.DataParallel(model).to(device)
-
-    # load model
-    print('loading pretrained model from %s' % opt.saved_model)
-    model.load_state_dict(torch.load(opt.saved_model, map_location=device))
-
-    # prepare data. two demo images from https://github.com/bgshih/crnn#run-demo
     AlignCollate_demo = AlignCollate(imgH=opt.imgH, imgW=opt.imgW, keep_ratio_with_pad=opt.PAD)
     demo_data = RawDataset(root=images, opt=opt)  # use RawDataset
     demo_loader = torch.utils.data.DataLoader(
