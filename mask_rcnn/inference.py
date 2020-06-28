@@ -15,7 +15,7 @@ import cv2
 import numpy as np
 
 # from utils.pre_processing import shi_tomashi, get_destination_points, unwarp
-
+from utils.percpective import find_rectangle_size
 # ROOT = os.path.abspath('../')
 # CONFIG = 'code/mask_rcnn/config'
 # WEIGHTS = 'code/mask_rcnn/weights'
@@ -48,25 +48,11 @@ class Mask_RCNN_detector():
 
         res = []
         for bbox in outputs["instances"].pred_boxes.tensor.numpy():
-            # visMask = (mask * 255).astype("uint8")
-            # print(visMask.shape)
-            # visMask = visMask.reshape(visMask.shape[0],visMask.shape[1])
-            # x, y, w, h = cv2.boundingRect(visMask)
-            # print("x:{0}, y:{1}, width:{2}, height:{3}".format(x, y, w, h))
-
-            # contours, hierarchy = cv2.findContours(visMask.copy(), 1, 1) # not copying here will throw an error
-            # rect = cv2.minAreaRect(contours[0]) # basically you can feed this rect into your classifier
-            # (x,y),(w,h), a = rect # a - angle
-            # box = cv2.boxPoints(rect)
-            # box = np.int0(box) #turn into ints
-
-            # cropped = im[box[1][1]:box[3][1], box[0][0]:box[2][0]]
-            # res.append(cropped)
+          
             print(len(bbox),bbox)
             img = im.copy()
-            img = img[int(bbox[1]):int(bbox[3]),int(bbox[0]):int(bbox[2]) ]
+            img = img[abs(int(bbox[1]-10)):abs(int(bbox[3]+10)),abs(int(bbox[0]-10)):abs(int(bbox[2]+10)) ]
+            img = find_rectangle_size(img)
             res.append(img)
-        # mask = outputs["instances"].pred_masks.numpy()
-        # bboxes = outputs["instances"].pred_boxes.tensor.numpy()
         
-            return res
+        return res

@@ -3,16 +3,13 @@ import os
 import numpy as np
 import pandas as pd
 import cv2
-# import ocr_tools.craft_ocr.imgproc
-import imgproc
+import ocr_tools.craft_ocr.imgproc
 from copy import deepcopy
 from PIL import Image
 from operator import itemgetter
-# from ocr_tools.craft_ocr.PerspectiveTransform import four_point_transform
-# from ocr_tools.craft_ocr.deeptext.demo import demo
+from ocr_tools.craft_ocr.PerspectiveTransform import four_point_transform
+from ocr_tools.craft_ocr.deeptext.demo import demo
 
-from PerspectiveTransform import four_point_transform
-# from deeptext.demo import demo
 
 # borrowed from https://github.com/lengstrom/fast-style-transfer/blob/master/src/utils.py
 def get_files(img_dir):
@@ -78,79 +75,32 @@ def list_files(in_path):
     return img_files, mask_files, gt_files
 
 
-# def saveResult(img_file, img, boxes, model, converter, args=None):
-#         """
-
-#         save text detection result one by one
-#         Args:
-#             img_file (str): image file name
-#             img (array): raw image context
-#             boxes (array): array of result file
-#                 Shape: [num_detections, 4] for BB output / [num_detections, 4] for QUAD output
-#         Return:
-#             text of picture, picture's name
-
-#         """
-
-#         img = np.array(img)
-#         img_copy = deepcopy(img)
-#         # make result file list
-#         filename, _ = os.path.splitext(os.path.basename(img_file))
-
-#         bboxes = []
-#         boxes = sort_boxes(boxes)
-
-#         for i, box in enumerate(boxes):
-#             poly = box.reshape(-1, 2)
-#             warped = four_point_transform(img_copy, poly)
-#             img_ = Image.fromarray(warped, 'RGB')
-#             bboxes.append(img_)
-
-#         text = demo(args, bboxes, model, converter)
-
-#         return text, filename
-
-
-def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=None):
-        """ save text detection result one by one
+def saveResult(img_file, img, boxes, model, converter, args=None):
+        """
+        save text detection result one by one
         Args:
             img_file (str): image file name
             img (array): raw image context
             boxes (array): array of result file
                 Shape: [num_detections, 4] for BB output / [num_detections, 4] for QUAD output
         Return:
-            None
+            text of picture, picture's name
         """
+
         img = np.array(img)
-
+        img_copy = deepcopy(img)
         # make result file list
-        filename, file_ext = os.path.splitext(os.path.basename(img_file))
+        filename, _ = os.path.splitext(os.path.basename(img_file))
 
-        # result directory
-        res_file = dirname + "res_" + filename + '.txt'
-        res_img_file = dirname + "res_" + filename + '.jpg'
+        bboxes = []
+        boxes = sort_boxes(boxes)
 
-        if not os.path.isdir(dirname):
-            os.mkdir(dirname)
+        for i, box in enumerate(boxes):
+            poly = box.reshape(-1, 2)
+            warped = four_point_transform(img_copy, poly)
+            img_ = Image.fromarray(warped, 'RGB')
+            bboxes.append(img_)
 
-        with open(res_file, 'w') as f:
-            for i, box in enumerate(boxes):
-                poly = np.array(box).astype(np.int32).reshape((-1))
-                strResult = ','.join([str(p) for p in poly]) + '\r\n'
-                f.write(strResult)
+        text = demo(args, bboxes, model, converter)
 
-                poly = poly.reshape(-1, 2)
-                cv2.polylines(img, [poly.reshape((-1, 1, 2))], True, color=(0, 0, 255), thickness=2)
-                ptColor = (0, 255, 255)
-                if verticals is not None:
-                    if verticals[i]:
-                        ptColor = (255, 0, 0)
-
-                if texts is not None:
-                    font = cv2.FONT_HERSHEY_SIMPLEX
-                    font_scale = 0.5
-                    cv2.putText(img, "{}".format(texts[i]), (poly[0][0]+1, poly[0][1]+1), font, font_scale, (0, 0, 0), thickness=1)
-                    cv2.putText(img, "{}".format(texts[i]), tuple(poly[0]), font, font_scale, (0, 255, 255), thickness=1)
-
-        # Save result image
-        cv2.imwrite(res_img_file, img)
+        return text, filename

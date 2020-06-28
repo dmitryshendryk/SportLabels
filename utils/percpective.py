@@ -72,8 +72,8 @@ def unwarp(img, src, dst):
     return un_warped
 
 
-def find_rectangle(image_path):
-    image = cv2.imread(image_path)
+def find_rectangle_size(image):
+    # image = cv2.imread(image_path)
     ratio = image.shape[0] / 300.0
     orig = image.copy()
     image = imutils.resize(image, height = 300)
@@ -117,12 +117,68 @@ def find_rectangle(image_path):
     perspective_fix =   unwarp(image, np.array(approx_corners), destination_corners)
     cropped = perspective_fix[0:h, 0:w]
     cropped = cv2.flip(cropped, -1)
-    cv2.imshow('Frame', thresh)
-    k = cv2.waitKey(0)
+    # cv2.imshow('Frame', cropped)
+    # k = cv2.waitKey(0)
 
-    if k == 27:         # If escape was pressed exit
-        cv2.destroyAllWindows(image)
+    # if k == 27:         # If escape was pressed exit
+    #     cv2.destroyAllWindows(image)
+    return cropped
 
-find_rectangle('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/test1/img10.jpg')
+def find_rectangle_box(image_path):
+    image = cv2.imread(image_path)
+    ratio = image.shape[0] / 300.0
+    orig = image.copy()
+    image = imutils.resize(image, height = 300)
+   
+    # convert the image to grayscale, blur it, and find edges
+    # in the image
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    ## filter label white color
+    kernel = np.ones((5,5), np.float32) / 15
+    filtered = cv2.filter2D(gray, -1, kernel)
+    ## threshold the label
+    ret, thresh = cv2.threshold(filtered, 250, 255, cv2.THRESH_OTSU)
+
+    ## find the contours
+    canvas = np.zeros(image.shape, np.uint8)
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    cnt = sorted(contours, key=cv2.contourArea, reverse=True)[0]
+    
+    cv2.drawContours(canvas, cnt, -1, (0, 255, 255), 3)
+    
+    epsilon = 0.02 * cv2.arcLength(cnt, True)
+    approx_corners = cv2.approxPolyDP(cnt, epsilon, True)
+    cv2.drawContours(canvas, approx_corners, -1, (255, 255, 0), 10)
+    approx_corners = sorted(np.concatenate(approx_corners).tolist())
+    print('\nThe corner points are ...\n')
+    approx_corners = np.array(approx_corners, dtype='float32')
+    # print(np.zeros((4, 2), dtype = "float32"))
+    approx_corners = order_points(approx_corners)
+    for index, c in enumerate(approx_corners):
+        character = chr(65 + index)
+        print(character, ':', c)
+        cv2.putText(canvas, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+
+    # Rearranging the order of the corner points
+    approx_corners = [approx_corners[i] for i in [0, 2, 1, 3]]
+    
+    destination_corners, h, w = get_destination_points(approx_corners)
+    print(destination_corners)
+
+    perspective_fix =   unwarp(image, np.array(approx_corners), destination_corners)
+    cropped = perspective_fix[0:h+20, 0:w+20]
+    cropped = cv2.flip(cropped, -1)
+    # cv2.imshow('Frame', cropped)
+    # k = cv2.waitKey(0)
+
+    # if k == 27:         # If escape was pressed exit
+        # cv2.destroyAllWindows(image)
+
+
+    
+
+
+# find_rectangle_box('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/test1/img13.jpg')
 
 
