@@ -32,6 +32,9 @@ from ocr_tools.craft_ocr.deeptext.model import Model
 from ocr_tools.craft_ocr.deeptext.utils import CTCLabelConverter, AttnLabelConverter
 from utils.barcode import read_barcode
 
+import pytesseract
+from pytesseract import Output
+
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -168,14 +171,17 @@ def start_craft(args, ROOT):
 
                 
                 for image in cropped_images:
-                    # cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
+                    print(os.path.join(ROOT,'imagenet/data/' + filename))
+                    cv2.imwrite(os.path.join(ROOT,'imagenet/data/' + filename),image)
                     barcode_result = read_barcode(image)
                     bboxes, polys, score_text = test_net(net, image, args.text_threshold,
                                                         args.link_threshold, args.low_text,
                                                         args.cuda, args.poly, refine_net, args=args)
                     text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, model=ocr_model, converter=converter, args=args)
+                    tesseract_text = pytesseract.image_to_string(image, output_type=Output.DICT)
                     print(text)
-                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])
+                    print(str(tesseract_text['text']))
+                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, str(tesseract_text['text']), barcode_result]]), columns=['name', 'characters', 'teseract_characters', 'barcode'])
                     dataframe = dataframe.append(df, ignore_index=False)
 
     if not os.path.isdir('output'):
