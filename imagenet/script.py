@@ -22,15 +22,15 @@ import shutil
 
 def prepare_dataset():
     ROOT = os.path.abspath('./')
-    iter_number = 0
-    list_dirs = os.listdir(os.path.join(ROOT, 'data/SAMPLEDATA/ADIDAS'))
+    iter_number = 1022
+    list_dirs = os.listdir(os.path.join(ROOT, 'data/PUMA'))
 
     for folder in list_dirs:
         if not folder.startswith('.'):
-            for img_name in os.listdir(os.path.join(ROOT,'data/SAMPLEDATA/ADIDAS', folder)):
+            for img_name in os.listdir(os.path.join(ROOT,'data/PUMA', folder)):
                 if not img_name.startswith('.'):
-                    src_path = os.path.join(ROOT,'data/SAMPLEDATA/ADIDAS', folder, img_name)
-                    dist_path = os.path.join(ROOT,'data/ssd', str(iter_number) + '.jpg' )
+                    src_path = os.path.join(ROOT,'data/PUMA', folder, img_name)
+                    dist_path = os.path.join(ROOT,'data/processed', str(iter_number) + '.jpg' )
                     shutil.copy(src_path,dist_path)
                     iter_number += 1 
 
