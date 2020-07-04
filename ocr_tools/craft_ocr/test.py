@@ -48,6 +48,56 @@ def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
 
+def centroids(boxes):
+    return [((box[0][0]+box[2][0])/2, (box[0][1]+box[2][1])/2) for box in boxes]
+
+
+def sort_boxes(boxes):
+
+    centers = centroids(boxes)
+    arrs = sorted(boxes, key = lambda x: x[0][1])
+    sorted_boxes = []
+    i = 0
+
+    if len(arrs) > 1:
+        for idx in range(1, len(arrs)):
+
+            if not(arrs[idx][0][1] - 3 <= centers[idx - 1][1] <= arrs[idx][2][1] + 3) :
+                if idx < len(arrs) - 1:
+                    sorted_boxes.extend(sorted(arrs[i: idx], key=lambda x: x[0][0]))
+                    i = idx
+                    continue
+                if idx == len(arrs) - 1 and idx - 1 == i:
+                    sorted_boxes.extend(sorted(arrs[idx - 1: ], key = lambda x: x[0][0]))
+                    break
+                else:
+                    sorted_boxes.extend(sorted(arrs[i:], key=lambda x: x[0][0]))
+                    break
+
+    else:
+        sorted_boxes.extend(boxes)
+    return sorted_boxes
+
+
+def order_hash_table(centers, chap_coord, polys):
+    chap_coord = np.array([np.array(box).astype(np.int32).reshape((-1)) for box in chap_coord])
+    groups = dd(list)
+    visited = set()
+    for i, chapter in enumerate(chap_coord):
+        left_x, left_y, right_x, right_y = chapter[0], chapter[1], chapter[4], chapter[5]
+
+        for j, center in enumerate(centers):
+
+            x, y = center[0], center[1]
+
+            if (left_x - 8 < x < right_x + 8) and (left_y - 8 < y < right_y + 8):
+                visited.add(j)
+                groups[i].append(polys[j])
+
+        groups[i] = sorted(groups[i], key = lambda x: x[0][0])
+    return groups
+
+
 def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, refine_net=None, args=None):
     t0 = time.time()
 
@@ -97,7 +147,7 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     if args.show_time : print("\ninfer/postproc time : {:.3f}/{:.3f}".format(t0, t1))
 
-    return boxes, polys, ret_score_text
+    return polys
 
 
 
@@ -157,9 +207,8 @@ def start_craft(args, ROOT):
     for dirpath, dirnames, filenames in os.walk(args.test_folder):
         if filenames:
             folder_name = os.path.split(dirpath)[-1]
-            k=0
-            for filename in filenames:
-                k += 1
+
+            for k, filename in enumerate(filenames):
                 image_path = os.path.join(dirpath, filename)
                 print("Test image {:d}/{:d}: {:s}".format(k, len(filenames), image_path), end='\r')
                 image = imgproc.loadImage(image_path)
@@ -170,10 +219,19 @@ def start_craft(args, ROOT):
                 for image in cropped_images:
                     cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
                     barcode_result = read_barcode(image)
-                    bboxes, polys, score_text = test_net(net, image, args.text_threshold,
+                    chapters_coord = test_net(net, image, args.text_threshold,
+                                                    args.link_threshold, args.low_text,
+                                                    args.cuda, args.poly, refine_net, args=args)
+
+                    polys= test_net(net, image, args.text_threshold,
                                                         args.link_threshold, args.low_text,
-                                                        args.cuda, args.poly, refine_net, args=args)
-                    text, name = file_utils.saveResult(image_path, image[:,:,::-1], polys, model=ocr_model, converter=converter, args=args)
+                                                        args.cuda, args.poly, refine_net=None, args=args)
+
+                    centers = centroids(polys)
+                    chapters_coord = sort_boxes(chapters_coord)
+                    groups = order_hash_table(centers, chapters_coord, polys)
+
+                    text, name = file_utils.saveResult(image_path, image[:,:,::-1], groups, model=ocr_model, converter=converter, args=args)
                     print(text)
                     df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])
                     dataframe = dataframe.append(df, ignore_index=False)

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
     parser.add_argument('--show_time', default=False, action='store_true', help='show processing time')
     parser.add_argument('--test_folder', default='/data/', type=str, help='folder path to input images')
-    parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
+    parser.add_argument('--refine', default=True, action='store_true', help='enable link refiner')
     parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str,
                         help='pretrained refiner model')
     parser.add_argument('--image_folder', default='lol', help='path to image_folder which contains text images')
