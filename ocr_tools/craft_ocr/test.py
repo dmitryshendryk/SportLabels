@@ -32,6 +32,7 @@ from ocr_tools.craft_ocr.deeptext.model import Model
 from ocr_tools.craft_ocr.deeptext.utils import CTCLabelConverter, AttnLabelConverter
 from utils.barcode import read_barcode
 
+from collections import defaultdict as dd
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -82,6 +83,7 @@ def sort_boxes(boxes):
 def order_hash_table(centers, chap_coord, polys):
     chap_coord = np.array([np.array(box).astype(np.int32).reshape((-1)) for box in chap_coord])
     groups = dd(list)
+    # groups = []
     visited = set()
     for i, chapter in enumerate(chap_coord):
         left_x, left_y, right_x, right_y = chapter[0], chapter[1], chapter[4], chapter[5]
@@ -186,7 +188,7 @@ def start_craft(args, ROOT):
     # LinkRefiner
     refine_net = None
     if args.refine:
-        from refinenet import RefineNet
+        from ocr_tools.craft_ocr.refinenet import RefineNet
         refine_net = RefineNet()
         print('Loading weights of refiner from checkpoint (' + args.refiner_model + ')')
         if args.cuda:
@@ -233,11 +235,11 @@ def start_craft(args, ROOT):
 
                     text, name = file_utils.saveResult(image_path, image[:,:,::-1], groups, model=ocr_model, converter=converter, args=args)
                     print(text)
-                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), text, barcode_result]]), columns=['name', 'characters', 'barcode'])
+                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), ' '.join(text), barcode_result]]), columns=['name', 'characters', 'barcode'])
                     dataframe = dataframe.append(df, ignore_index=False)
 
     if not os.path.isdir('output'):
         os.mkdir('output')
-    dataframe.to_csv(os.path.join('output', 'out.csv'), index=False)
+    dataframe.to_csv(os.path.join('output', 'out.csv'), line_terminator='\n', index=False)
 
     print("elapsed time : {}s".format(time.time() - t))
