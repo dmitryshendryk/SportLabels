@@ -35,7 +35,7 @@ class Mask_RCNN_detector():
         cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # faster, and good enough for this toy dataset (default: 512)
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1  # only has one class (ballon)
 
-        cfg.MODEL.WEIGHTS = os.path.join(ROOT, 'mask_rcnn/weights', "mask_rcnn_model_final.pth")
+        cfg.MODEL.WEIGHTS = os.path.join(ROOT, 'mask_rcnn/weights', "model_0025999.pth")
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set the testing threshold for this model
         
         self.predictor = DefaultPredictor(cfg)

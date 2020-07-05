@@ -17,42 +17,6 @@ def get_files(img_dir):
     return imgs, masks, xmls
 
 
-def sort_boxes(boxes):
-    boxes = np.array([np.array(box).astype(np.int32).reshape((-1)) for box in boxes])
-    arrs = sorted(boxes, key=itemgetter(1))
-    sorted_boxes = []
-
-    while True:
-
-        if not arrs:
-            break
-
-        boxxes = [arrs[0]]
-
-        if len(arrs) > 1:
-            for j in range(1, len(arrs)):
-                above = boxxes[-1][1]
-                below = (boxxes[-1][7] + above) / 2
-                aim_cell = arrs[j][1]
-
-                if above <= aim_cell <= below:
-                    boxxes.append(arrs[j])
-
-                else:
-                    break
-
-            boxxes = sorted(boxxes, key=itemgetter(0))
-            sorted_boxes.extend(boxxes)
-            boxxes.clear()
-            arrs = arrs[j:]
-
-        else:
-            sorted_boxes.extend(boxxes)
-            break
-
-    return np.array(sorted_boxes)
-
-
 def list_files(in_path):
     img_files = []
     mask_files = []
@@ -75,7 +39,11 @@ def list_files(in_path):
     return img_files, mask_files, gt_files
 
 
-def saveResult(img_file, img, boxes, model, converter, args=None):
+def join_text(text):
+    return ' '.join(text) + '\n'
+
+
+def saveResult(img_file, img, groups, model, converter, args=None):
         """
         save text detection result one by one
         Args:
@@ -91,16 +59,20 @@ def saveResult(img_file, img, boxes, model, converter, args=None):
         img_copy = deepcopy(img)
         # make result file list
         filename, _ = os.path.splitext(os.path.basename(img_file))
+        font = cv2.FONT_HERSHEY_SIMPLEX
 
-        bboxes = []
-        boxes = sort_boxes(boxes)
+        text_boxes = []
 
-        for i, box in enumerate(boxes):
-            poly = box.reshape(-1, 2)
-            warped = four_point_transform(img_copy, poly)
-            img_ = Image.fromarray(warped, 'RGB')
-            bboxes.append(img_)
+        for idx, boxes in groups.items():
+            if boxes:
+                bboxes = []
+                for box in boxes:
+                    poly = np.array(box).astype(np.int32).reshape((-1, 2))
+                    warped = four_point_transform(img_copy, poly)
+                    img_ = Image.fromarray(warped, 'RGB')
+                    bboxes.append(img_)
 
-        text = demo(args, bboxes, model, converter)
+                text = demo(args, bboxes, model, converter)
+                text_boxes.append(join_text(text))
 
-        return text, filename
+        return text_boxes, filename
