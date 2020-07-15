@@ -213,13 +213,17 @@ def start_craft(args, ROOT):
             for k, filename in enumerate(filenames):
                 image_path = os.path.join(dirpath, filename)
                 print("Test image {:d}/{:d}: {:s}".format(k, len(filenames), image_path), end='\r')
-                image = imgproc.loadImage(image_path)
-
-                cropped_images = mask_rcnn.detection(image, args.cuda)
+                image_loaded = imgproc.loadImage(image_path)
+                
+                # if folder_name == 'size':
+                #     cropped_images = mask_rcnn.detection(image_loaded, args.cuda)
+                # else:
+                #     cropped_images = [image_loaded]
 
                 
-                for image in cropped_images:
-                    cv2.imwrite('/Users/dmitry/Documents/Business/Projects/Upwork/SportLabels/code/imagenet/data/' + filename,image)
+                for image in [image_loaded]:
+                    save_path = os.path.join(ROOT, 'imagenet/data/')
+                    cv2.imwrite(save_path + filename,image)
                     barcode_result = read_barcode(image)
                     chapters_coord = test_net(net, image, args.text_threshold,
                                                     args.link_threshold, args.low_text,

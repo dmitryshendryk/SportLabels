@@ -35,7 +35,7 @@ class Mask_RCNN_detector():
         cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # faster, and good enough for this toy dataset (default: 512)
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1  # only has one class (ballon)
 
-        cfg.MODEL.WEIGHTS = os.path.join(ROOT, 'mask_rcnn/weights', "model_0025999.pth")
+        cfg.MODEL.WEIGHTS = os.path.join(ROOT, 'mask_rcnn/weights', "mask_rcnn_model_final.pth")
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set the testing threshold for this model
         
         self.predictor = DefaultPredictor(cfg)
@@ -51,8 +51,9 @@ class Mask_RCNN_detector():
           
             print(len(bbox),bbox)
             img = im.copy()
-            img = img[abs(int(bbox[1]-10)):abs(int(bbox[3]+10)),abs(int(bbox[0]-10)):abs(int(bbox[2]+10)) ]
-            img = find_rectangle_size(img)
+            # img = img[abs(int(bbox[1]-10)):abs(int(bbox[3]+10)),abs(int(bbox[0]-10)):abs(int(bbox[2]+10)) ]
+            img = img[int(bbox[1]):int(bbox[3]),int(bbox[0]):int(bbox[2]) ]
+            # img = find_rectangle_size(img)
             res.append(img)
-        
+        print("Images to process {}".format(len(res)))
         return res
