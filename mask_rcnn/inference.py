@@ -47,7 +47,8 @@ class Mask_RCNN_detector():
 
 
         res = []
-        for bbox in outputs["instances"].pred_boxes.tensor.numpy():
+        outputs = outputs["instances"].to("cpu")
+        for bbox in outputs.pred_boxes.tensor.numpy():
           
             print(len(bbox),bbox)
             img = im.copy()

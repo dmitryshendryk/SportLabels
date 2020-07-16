@@ -196,7 +196,7 @@ def start_craft(args, ROOT):
             refine_net = refine_net.cuda()
             refine_net = torch.nn.DataParallel(refine_net)
         else:
-            refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location='cpu')))
+            refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location=args.device)))
 
         refine_net.eval()
         args.poly = True
@@ -216,14 +216,15 @@ def start_craft(args, ROOT):
                 image_loaded = imgproc.loadImage(image_path)
                 
                 # if folder_name == 'size':
-                #     cropped_images = mask_rcnn.detection(image_loaded, args.cuda)
+                cropped_images = mask_rcnn.detection(image_loaded, args.cuda)
                 # else:
                 #     cropped_images = [image_loaded]
 
                 
                 for image in [image_loaded]:
                     save_path = os.path.join(ROOT, 'imagenet/data/')
-                    cv2.imwrite(save_path + filename,image)
+                    if len(cropped_images) != 0:
+                        cv2.imwrite(save_path + filename, cropped_images[0])
                     barcode_result = read_barcode(image)
                     chapters_coord = test_net(net, image, args.text_threshold,
                                                     args.link_threshold, args.low_text,
@@ -239,7 +240,7 @@ def start_craft(args, ROOT):
 
                     text, name = file_utils.saveResult(image_path, image[:,:,::-1], groups, model=ocr_model, converter=converter, args=args)
                     print(text)
-                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), ' '.join(text), barcode_result]]), columns=['name', 'characters', 'barcode'])
+                    df = pd.DataFrame(np.array([[folder_name + '_' + str(name), ' '.join(text), barcode_result, folder_name]]), columns=['name', 'characters', 'barcode','type'])
                     dataframe = dataframe.append(df, ignore_index=False)
 
     if not os.path.isdir('output'):
